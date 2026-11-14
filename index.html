@@ -581,7 +581,7 @@ function renderExamSetup() {
       <div class="exam-module-grid">${topics.map(topic=>{const count=state.questions.filter(q=>q.topic===topic).length;const active=selectedTopics.includes(topic);return `<button type="button" class="exam-module-option ${active?'active':''}" data-action="exam-topic" data-topic="${esc(topic)}" aria-pressed="${active}"><span class="exam-module-check">${active?'✓':'+'}</span><span class="exam-module-name">${esc(topic)}</span><span class="exam-module-count">${count} Q</span></button>`;}).join('')}</div>
       <div class="exam-settings-grid">
         <div class="exam-setting"><label class="filter-label" for="exam-question-count">NUMBER OF QUESTIONS</label><input class="field" id="exam-question-count" type="number" min="1" max="201" step="1" value="${state.examQuestionCount}" /><div class="small-note">${available} questions available in the selected units.</div></div>
-        <div class="exam-setting"><label class="filter-label" for="exam-duration-input">TIME LIMIT (MINUTES)</label><input class="field" id="exam-duration-input" type="number" min="1" max="240" step="1" value="${state.examDuration}" /><div class="small-note">Choose any whole number from 1 to 240 minutes.</div></div>
+        <div class="exam-setting"><label class="filter-label" for="exam-duration-input">TIME LIMIT (MINUTES)</label><input class="field" id="exam-duration-input" type="number" min="1" step="1" value="${state.examDuration}" /><div class="small-note">Enter any positive whole number of minutes.</div></div>
       </div>
       <div class="exam-duration-presets">${[30,60,70].map(n=>`<button class="exam-config-option ${state.examDuration===n?'active':''}" data-action="exam-duration" data-duration="${n}"><strong>${n}</strong><span>minutes</span></button>`).join('')}</div>
       <div class="callout">Questions are randomized from your selected units. Navigate between questions, mark items for review, and submit whenever you are ready. The test submits automatically when the timer reaches zero.</div>
@@ -732,7 +732,7 @@ function setupDynamicControls() {
   const prediction = $('#exam-prediction');
   if (prediction && state.exam) prediction.addEventListener('input',()=>{const id=state.exam.items[state.exam.index].id;state.exam.answers[id]=prediction.value;state.exam.touched[id]=true;});
   const examCount=$('#exam-question-count'); if(examCount){examCount.addEventListener('input',()=>{const n=Math.floor(Number(examCount.value));if(Number.isFinite(n)&&n>=1)state.examQuestionCount=Math.min(201,n);});examCount.addEventListener('change',()=>{examCount.value=state.examQuestionCount;});}
-  const examDuration=$('#exam-duration-input'); if(examDuration){examDuration.addEventListener('input',()=>{const n=Math.floor(Number(examDuration.value));if(Number.isFinite(n)&&n>=1)state.examDuration=Math.min(240,n);});examDuration.addEventListener('change',()=>{examDuration.value=state.examDuration;});}
+  const examDuration=$('#exam-duration-input'); if(examDuration){examDuration.addEventListener('input',()=>{const n=Math.floor(Number(examDuration.value));if(Number.isFinite(n)&&n>=1)state.examDuration=n;});examDuration.addEventListener('change',()=>{examDuration.value=state.examDuration;});}
 }
 function filterBankRows() {
   const rows = $$('[data-bank-row]');
@@ -933,7 +933,7 @@ function startExam() {
   const items = pool.slice();
   for (let i=items.length-1;i>0;i--) { const k=Math.floor(Math.random()*(i+1)); [items[i],items[k]]=[items[k],items[i]]; }
   const selectedItems = items.slice(0,questionCount);
-  const duration = Math.max(1,Math.min(240,Math.floor(Number(state.examDuration)||30)));
+  const duration = Math.max(1,Math.floor(Number(state.examDuration)||30));
   state.exam={items:selectedItems,duration,remaining:duration*60,index:0,answers:{},marked:[],startedAt:Date.now(),timings:{},touched:{},questionStartedAt:Date.now(),topics:selectedTopics.slice()};
   state.examResult=null;
   selectedItems.forEach(q=>{if(q.mode!=='predict')state.exam.answers[q.id]=q.starterCode||'';else state.exam.answers[q.id]='';});
@@ -1006,7 +1006,7 @@ document.addEventListener('click', event=>{
   if(name==='clear-filters'){state.filters={q:'',topic:'all',difficulty:'all',status:'all',mode:'all'};render();return;}
   if(name==='show-all-logic'){const panel=$('#page-content');if(panel){const all=QUICK_REVISION.map(([t,f,d])=>logicCard(t,f,d)).join('');const block=document.createElement('div');block.className='panel';block.style.marginTop='14px';block.innerHTML=`<div class="panel-header"><h3 class="panel-title">All Conditions & Loops</h3><span class="status-chip">Quick revision</span></div><div class="quick-revision">${all}</div>`;panel.append(block);action.textContent='All Conditions & Loops shown';action.disabled=true;}return;}
   if(name==='next-question'){nextQuestion();return;}
-  if(name==='exam-duration'){state.examDuration=Math.max(1,Math.min(240,Math.floor(Number(action.dataset.duration)||30)));render();return;}
+  if(name==='exam-duration'){state.examDuration=Math.max(1,Math.floor(Number(action.dataset.duration)||30));render();return;}
   if(name==='exam-topic'){const topics=[...new Set(state.questions.map(q=>q.topic))];const selected=Array.isArray(state.examTopics)?[...state.examTopics]:topics;const topic=action.dataset.topic;state.examTopics=selected.includes(topic)?selected.filter(t=>t!==topic):[...selected,topic];render();return;}
   if(name==='exam-topics-all'){state.examTopics=null;render();return;}
   if(name==='exam-topics-clear'){state.examTopics=[];render();return;}
