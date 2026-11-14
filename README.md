@@ -14,7 +14,7 @@ Open the GitHub Pages URL in a modern browser. No local installation is required
 - 12 output-prediction questions
 - Ten dedicated units: Conditions & Loops, 1D Arrays, 2D Arrays and Matrices, Searching, Sorting, Pointers and Pointer Arithmetic, Pointer to Pointer and Arrays of Pointers, Dynamic Memory Allocation, Functions, and Recursion
 - Four evaluation cases per new exam question, with samples, hints and hidden-in-app solutions
-- Configurable mock exams: select units, set question count, and choose any 1–240 minute duration (30, 60 and 70 minute presets included)
+- Configurable mock exams: select units, set question count, and choose any positive whole-number duration (30, 60 and 70 minute presets included)
 - Timed exam navigation, mark-for-review palette, automatic submission, and topic-wise results
 - Browser-local progress tracking
 - C++17 compilation via the bundled local Clang/WASI compiler
